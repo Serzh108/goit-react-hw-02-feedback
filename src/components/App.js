@@ -1,20 +1,55 @@
-import React from 'react';
-// import Profile from './Profile/Profile';
-// import Statistics from './Statistics/Statistics';
-// import FfiendList from './FriendList/FriendList';
-// import TransactionHistory from './TransactionHistory/TransactionHistory';
-// import user from './Profile/user.json';
-// import statisticalData from './Statistics/statistical-data.json';
-// import friends from './FriendList/friends.json';
-// import transactions from './TransactionHistory/transactions.json';
+import React, { Component } from 'react';
+import Section from './Section/Section';
+import Statistics from './Statistics/Statistics';
+import FeedbackOptions from './FeedbackOptions/FeedbackOptions';
+import Notification from './Notification/Notification';
 
-const App = () => (
-  <>
-  <h2>Home work - 02 React</h2>
-    {/* <Profile {...user} /> */}
-    {/* <Statistics title="Upload stats" stats={statisticalData} /> */}
-    {/* <FfiendList friends={friends} /> */}
-    {/* <TransactionHistory items={transactions} /> */}
-  </>
-);
+class App extends Component {
+  state = {
+    good: 0,
+    neutral: 0,
+    bad: 0,
+  };
+
+  clickHandler = e => {
+    let key = e.target.name;
+    this.setState(prev => ({ [key]: prev[key] + 1 }));
+  };
+
+  countTotalFeedback = () =>
+    Object.values(this.state).reduce((acc, item) => acc + item, 0);
+
+  // countTotalFeedback() {
+  //   const sum = Object.values( this.state).reduce((acc, item) => acc + item, 0);
+  //   return sum;
+  // };
+  countPositiveFeedbackPercentage = () =>
+    Math.round((this.state.good / this.countTotalFeedback()) * 100);
+
+  render() {
+    // const x = this.countPositiveFeedbackPercentage();
+    // console.log(typeof x);
+    const isFeedBack = Boolean(this.countTotalFeedback());
+    return (
+      <>
+        <Section title="Please leave feedback">
+          <FeedbackOptions clickHandler={this.clickHandler} />
+        </Section>
+        <Section title={isFeedBack ? 'Statistic' : ''}>
+          {isFeedBack && (
+            <Statistics
+              {...this.state}
+              countTotalFeedback={this.countTotalFeedback}
+              countPositiveFeedbackPercentage={
+                this.countPositiveFeedbackPercentage
+              }
+            />
+          )}
+          {!isFeedBack && <Notification message="No feedback given" />}
+        </Section>
+      </>
+    );
+  }
+}
+
 export default App;
